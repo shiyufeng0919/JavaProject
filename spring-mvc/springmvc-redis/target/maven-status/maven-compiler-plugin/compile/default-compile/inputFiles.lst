@@ -1,0 +1,9 @@
+/Users/shiyufeng/Documents/workspace/javalang/JavaProject/spring-mvc/springmvc-multi-datasource/src/main/java/com/syf/datasource/DataSourceChange.java
+/Users/shiyufeng/Documents/workspace/javalang/JavaProject/spring-mvc/springmvc-multi-datasource/src/main/java/com/syf/model/TUser.java
+/Users/shiyufeng/Documents/workspace/javalang/JavaProject/spring-mvc/springmvc-multi-datasource/src/main/java/com/syf/datasource/DataSourceAspectException.java
+/Users/shiyufeng/Documents/workspace/javalang/JavaProject/spring-mvc/springmvc-multi-datasource/src/main/java/com/syf/controller/TUserController.java
+/Users/shiyufeng/Documents/workspace/javalang/JavaProject/spring-mvc/springmvc-multi-datasource/src/main/java/com/syf/service/ITUserService.java
+/Users/shiyufeng/Documents/workspace/javalang/JavaProject/spring-mvc/springmvc-multi-datasource/src/main/java/com/syf/dao/TUserMapper.java
+/Users/shiyufeng/Documents/workspace/javalang/JavaProject/spring-mvc/springmvc-multi-datasource/src/main/java/com/syf/datasource/DynamicDataSource.java
+/Users/shiyufeng/Documents/workspace/javalang/JavaProject/spring-mvc/springmvc-multi-datasource/src/main/java/com/syf/datasource/DataSourceAspect.java
+/Users/shiyufeng/Documents/workspace/javalang/JavaProject/spring-mvc/springmvc-multi-datasource/src/main/java/com/syf/service/impl/ITUserServiceImpl.java

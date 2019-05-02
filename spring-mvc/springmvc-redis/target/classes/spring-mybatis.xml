@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-3.1.xsd
+	http://www.springframework.org/schema/mvc
+	http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd">
+    <!--spring与mybatis整合-->
+    <!-- 自动扫描 -->
+    <context:component-scan base-package="com.syf" />
+    <!-- 引入jdbc.properties配置文件 -->
+    <!--<bean id="propertyConfigurer"-->
+          <!--class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">-->
+        <!--<property name="location" value="classpath:jdbc.properties" />-->
+    <!--</bean>-->
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <!--    private Resource[] locations; -->
+            <list>
+                <value>classpath:jdbc.properties</value>
+                <value>classpath:redis-ms.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <!--公共数据源，数据连接池可以选择c3p0-->
+    <bean id="base-dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+          destroy-method="close">
+        <!-- 初始化连接大小 -->
+        <property name="initialSize" value="${initialSize}"></property>
+        <!-- 连接池最大数量 -->
+        <property name="maxActive" value="${maxActive}"></property>
+        <!-- 连接池最大空闲 -->
+        <property name="maxIdle" value="${maxIdle}"></property>
+        <!-- 连接池最小空闲 -->
+        <property name="minIdle" value="${minIdle}"></property>
+        <!-- 获取连接最大等待时间 -->
+        <property name="maxWait" value="${maxWait}"></property>
+    </bean>
+
+    <!--主库:一般用于写库-->
+    <bean name="master-datasource" parent="base-dataSource" destroy-method="close">
+        <property name="driverClassName" value="${mysql_driver}" />
+        <property name="url" value="${master_url}" />
+        <property name="username" value="${master_username}" />
+        <property name="password" value="${master_password}" />
+    </bean>
+
+    <!--从库：一般用于读库-->
+    <bean name="slave-datasource" parent="base-dataSource" destroy-method="close">
+        <property name="driverClassName" value="${mysql_driver}" />
+        <property name="url" value="${slave_url}" />
+        <property name="username" value="${slave_username}" />
+        <property name="password" value="${slave_password}" />
+    </bean>
+
+    <!--主从库选择:配置动态分配的读写数据源-->
+    <bean id="dynamicDataSource" class="com.syf.datasource.DynamicDataSource">
+        <property name="master" ref="master-datasource" />
+        <property name="slaves">
+            <list>
+                <ref bean="slave-datasource" />
+            </list>
+        </property>
+    </bean>
+
+    <!-- spring和MyBatis完美整合，不需要mybatis的配置映射文件 -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dynamicDataSource" />
+        <!-- 自动扫描mapping.xml文件 -->
+        <property name="mapperLocations" value="classpath:mapper/*.xml"></property>
+    </bean>
+
+    <!-- DAO接口所在包名，Spring会自动查找其下的类 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.syf.dao" />
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property>
+    </bean>
+
+    <!-- (事务管理)transaction manager, use JtaTransactionManager for global tx -->
+    <bean id="transactionManager"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dynamicDataSource" />
+    </bean>
+
+    <import resource="spring-redis-ms.xml" />
+
+</beans>
