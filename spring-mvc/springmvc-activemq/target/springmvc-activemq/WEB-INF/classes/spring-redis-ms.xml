@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:jee="http://www.springframework.org/schema/jee"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:task="http://www.springframework.org/schema/task" xmlns:cache="http://www.springframework.org/schema/cache"
+       xmlns:c='http://www.springframework.org/schema/c' xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+        http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.0.xsd
+        http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-4.0.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd
+        http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.0.xsd
+        http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache-3.1.xsd"
+       default-lazy-init="true">
+    <!-- 两种方案：使用jedis连接池(单机版)和jedis集群 -->
+    <!-- 一般生产环境使用集群，开发环境使用单机版 -->
+    <!-- 使用哪种，可以将另一种注释掉 -->
+    <!-- 注意：如果在注入工具类的时候是按类型注入的话，那么不使用的工具类必须注释掉-->
+    <!-- 单机版 -->
+    <!-- 配置jedis连接池 -->
+    <bean class="redis.clients.jedis.JedisPool">
+        <constructor-arg name="host" value="${redis.host}" />
+        <constructor-arg name="port" value="${redis.port}" />
+    </bean>
+
+    <!-- 配置单机版工具类 -->
+    <bean class="com.syf.redis.RedisPool" />
+
+
+    <!-- 集群版 -->
+    <!-- 配置jedis集群 -->
+    <!--<bean class="redis.clients.jedis.JedisCluster">-->
+        <!--<constructor-arg name="nodes">-->
+            <!--<set>-->
+                <!--<bean class="redis.clients.jedis.HostAndPort">-->
+                    <!--<constructor-arg name="host" value="${cluster.host1}" />-->
+                    <!--<constructor-arg name="port" value="${cluster.port1}" />-->
+                <!--</bean>-->
+                <!--<bean class="redis.clients.jedis.HostAndPort">-->
+                    <!--<constructor-arg name="host" value="${cluster.host2}" />-->
+                    <!--<constructor-arg name="port" value="${cluster.port2}" />-->
+                <!--</bean>-->
+                <!--<bean class="redis.clients.jedis.HostAndPort">-->
+                    <!--<constructor-arg name="host" value="${cluster.host3}" />-->
+                    <!--<constructor-arg name="port" value="${cluster.port3}" />-->
+                <!--</bean>-->
+            <!--</set>-->
+        <!--</constructor-arg>-->
+    <!--</bean>-->
+
+    <!-- 配置集群版工具类 -->
+    <!--<bean class="com.syf.redis.RedisCluster" />-->
+</beans>

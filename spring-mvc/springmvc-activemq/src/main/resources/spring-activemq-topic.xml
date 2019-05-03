@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:amq="http://activemq.apache.org/schema/core"
+       xmlns:jms="http://www.springframework.org/schema/jms"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-4.1.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc-4.1.xsd
+        http://www.springframework.org/schema/jms
+        http://www.springframework.org/schema/jms/spring-jms-4.1.xsd
+        http://activemq.apache.org/schema/core
+        http://activemq.apache.org/schema/core/activemq-core-5.12.1.xsd"
+>
+    <!--activemq官网:http://activemq.apache.org/spring-support.html-->
+
+    <!--需要添加activemq的dtd(选中spring-jms-4.1.xsd->alt+enter选择手动设置，选择相应的包双击即可)-->
+
+    <!--选择tcp连接而不是http连接-->
+    <amq:connectionFactory id="amqConnectionFactory"
+                           brokerURL="${activemq_url}"
+                           userName="${activemq_username}"
+                           password="${activemq_password}" />
+
+    <!-- 配置JMS连接工厂-->
+    <!-- 这里可以采用连接池的方式连接PooledConnectionFactoryBean -->
+    <bean id="connectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
+        <!-- 配置连接 -->
+        <property name="targetConnectionFactory" ref="amqConnectionFactory"/>
+        <!-- 会话的最大连接数 -->
+        <property name="sessionCacheSize" value="100"/>
+    </bean>
+
+    <!-- 定义消息队列（Queue） -->
+    <!-- 定义消息队列topic类型，queue的方式差不多 -->
+    <bean id="topic" class="org.apache.activemq.command.ActiveMQTopic">
+        <!-- 定义名称 -->
+        <constructor-arg index="0" value="topic"/>
+    </bean>
+
+    <!-- 配置JMS模板（Queue），Spring提供的JMS工具类，它发送、接收消息。 -->
+    <!-- 为了测试发送消息，保留jmsTemplate的配置，实际不存在发送，只需要配置监听即可 -->
+    <bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+        <property name="connectionFactory" ref="connectionFactory"/>
+        <property name="defaultDestination" ref="topic"/>
+        <!-- 非pub/sub模型（发布/订阅），true为topic,false为queue -->
+        <property name="pubSubDomain" value="true"/>
+    </bean>
+
+
+    <!-- 监听方式，这种方式更实用，可以一直监听消息 -->
+    <bean id="topicMessageListen" class="com.syf.activemq.topic.TopicMessageListen"/>
+    <bean id="defaultMessageListenerContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+        <property name="connectionFactory" ref="connectionFactory"/>
+        <!-- 注册activemq名称 -->
+        <property name="destination" ref="topic"/>
+        <property name="messageListener" ref="topicMessageListen"/>
+    </bean>
+
+</beans>
